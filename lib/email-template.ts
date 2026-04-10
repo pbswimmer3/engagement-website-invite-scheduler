@@ -82,8 +82,11 @@ export function generateEmailHTML(
                     <p style="margin:0 0 2px; font-size:15px; color:#152D44; font-weight:bold;">
                       ${EVENT.venue}
                     </p>
-                    <p style="margin:0; font-size:13px; color:#888;">
+                    <p style="margin:0 0 8px; font-size:13px; color:#888;">
                       ${EVENT.address}
+                    </p>
+                    <p style="margin:0; font-size:13px; color:#444; font-weight:600;">
+                      Please RSVP by May 1st.
                     </p>
                   </td>
                 </tr>
