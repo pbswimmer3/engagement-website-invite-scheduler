@@ -25,7 +25,7 @@ export default function Dashboard() {
 
   const fetchGuests = async () => {
     try {
-      const res = await fetch('/api/guests')
+      const res = await fetch('/api/guests', { cache: 'no-store' })
       const data = await res.json()
       if (res.ok) setGroups(data.groups)
     } catch {
