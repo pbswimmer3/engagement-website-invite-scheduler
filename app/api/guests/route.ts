@@ -15,6 +15,9 @@ export async function GET() {
 
     if (error) throw error
 
+    console.log(`[DEBUG] Fetched ${guests?.length ?? 0} guests from Supabase at ${new Date().toISOString()}`)
+    console.log('[DEBUG] Sample guest:', guests?.[0])
+
     // Group guests by invitation_group (solo guests get their own group keyed by id)
     const groups: Record<string, typeof guests> = {}
 
