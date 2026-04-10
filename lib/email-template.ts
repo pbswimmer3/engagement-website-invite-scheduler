@@ -100,8 +100,13 @@ export function generateEmailHTML(
               ` : ''}
 
               <!-- Dress Code Note -->
-              <p style="margin:0 0 28px; font-size:14px; line-height:1.6; color:#666; font-style:italic;">
+              <p style="margin:0 0 16px; font-size:14px; line-height:1.6; color:#666; font-style:italic;">
                 Dress code &mdash; Men: Western Formal &bull; Women: Indian or Indo-Western
+              </p>
+
+              <!-- Gift Policy Note -->
+              <p style="margin:0 0 28px; font-size:14px; line-height:1.6; color:#666; font-style:italic;">
+                We are so grateful to have you celebrate this milestone with us. If you are thinking of bringing a gift, we humbly request no boxed gifts.
               </p>
 
               <!-- CTA Button -->
