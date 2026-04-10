@@ -92,7 +92,7 @@ Open [http://localhost:3000](http://localhost:3000).
 5. Click **Send** to send the invite to that group (all emails BCC'd)
 6. Or click **Send All Unsent** at the top to send every unsent invite at once
 7. Sent invites show a green checkmark and timestamp
-8. You can **Resend** any invite if needed.
+8. You can **Resend** any invite if needed
 
 ---
 
