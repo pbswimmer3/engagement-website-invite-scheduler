@@ -104,10 +104,6 @@ export function generateEmailHTML(
                 Dress code &mdash; Men: Western Formal &bull; Women: Indian or Indo-Western
               </p>
 
-              <!-- Gift Policy Note -->
-              <p style="margin:0 0 28px; font-size:14px; line-height:1.6; color:#666; font-style:italic;">
-                Should you wish to honor us with a gift, we kindly request no boxed gifts.
-              </p>
 
               <!-- CTA Button -->
               <a href="${websiteUrl}" target="_blank"
