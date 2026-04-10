@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 type Guest = {
@@ -17,6 +18,7 @@ type Groups = Record<string, Guest[]>
 export default function Dashboard() {
   const [groups, setGroups] = useState<Groups>({})
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [sending, setSending] = useState<string | null>(null)
   const [sendingAll, setSendingAll] = useState(false)
   const [preview, setPreview] = useState<string | null>(null)
@@ -24,14 +26,16 @@ export default function Dashboard() {
   const [flash, setFlash] = useState<{ key: string; ok: boolean; msg: string } | null>(null)
 
   const fetchGuests = async () => {
+    setRefreshing(true)
     try {
-      const res = await fetch('/api/guests')
+      const res = await fetch('/api/guests', { cache: 'no-store' })
       const data = await res.json()
       if (res.ok) setGroups(data.groups)
     } catch {
       console.error('Failed to fetch guests')
     } finally {
       setLoading(false)
+      setRefreshing(false)
     }
   }
 
@@ -99,9 +103,27 @@ export default function Dashboard() {
   return (
     <div className="max-w-3xl mx-auto px-6 py-12">
       {/* Header */}
-      <div className="text-center mb-10">
+      <div className="text-center mb-6">
         <h1 className="text-4xl font-bold text-darkdenim mb-2">Invite Sender</h1>
         <p className="text-navy/50 text-sm">Aanya &amp; Prad&apos;s Engagement Party</p>
+      </div>
+
+      {/* Nav + refresh */}
+      <div className="flex justify-center items-center gap-3 mb-8 text-xs uppercase tracking-wider">
+        <span className="px-4 py-2 bg-navy text-white rounded-lg">Invite Sender</span>
+        <Link
+          href="/rsvp-dashboard"
+          className="px-4 py-2 border border-gold/30 text-navy/60 rounded-lg hover:border-navy/40 transition-colors"
+        >
+          RSVP Dashboard
+        </Link>
+        <button
+          onClick={fetchGuests}
+          disabled={refreshing}
+          className="px-4 py-2 border border-gold/30 text-navy/60 rounded-lg hover:border-navy/40 transition-colors disabled:opacity-40"
+        >
+          {refreshing ? 'Refreshing...' : 'Refresh'}
+        </button>
       </div>
 
       {loading ? (
