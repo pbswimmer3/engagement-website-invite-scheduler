@@ -24,9 +24,20 @@ export async function GET() {
       groups[key].push(guest)
     }
 
-    return NextResponse.json({ groups })
+    return NextResponse.json({ groups }, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
+    })
   } catch (err) {
     console.error('Fetch guests error:', err)
-    return NextResponse.json({ error: 'Failed to fetch guests' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch guests' }, {
+      status: 500,
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
+    })
   }
 }
