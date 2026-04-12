@@ -2,7 +2,7 @@
 
 A simple admin app to send email invitations to guests for Aanya & Prad's engagement party. Connects to the same Supabase database as the engagement website, auto-generates personalized HTML emails per invitation group, and sends them via Gmail with one click.
 
-## Features
+## Features 
 
 - Pulls all guests from Supabase, grouped by `invitation_group`
 - Auto-generates a styled HTML email for each group with the hot air balloon background
