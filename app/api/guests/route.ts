@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const supabase = createAdminClient()
@@ -22,7 +24,10 @@ export async function GET() {
       groups[key].push(guest)
     }
 
-    return NextResponse.json({ groups })
+    return NextResponse.json(
+      { groups },
+      { headers: { 'Cache-Control': 'no-store, max-age=0' } }
+    )
   } catch (err) {
     console.error('Fetch guests error:', err)
     return NextResponse.json({ error: 'Failed to fetch guests' }, { status: 500 })
