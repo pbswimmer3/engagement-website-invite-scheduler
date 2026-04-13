@@ -11,7 +11,7 @@ A simple admin app to send email invitations to guests for Aanya & Prad's engage
 - One-click send per group, or "Send All Unsent" for bulk
 - All recipients BCC'd (privacy-friendly)
 - Tracks which invitations have been sent (persisted in Supabase)
-- Email preview before sending
+- Email preview before sending 
 
 ---
 
