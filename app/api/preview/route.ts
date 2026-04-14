@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
 import { generateEmailHTML } from '@/lib/email-template'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   try {
     const ids = req.nextUrl.searchParams.get('ids')?.split(',') ?? []

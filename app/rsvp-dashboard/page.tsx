@@ -47,7 +47,7 @@ export default function RsvpDashboard() {
   const fetchGuests = async () => {
     setRefreshing(true)
     try {
-      const res = await fetch('/api/guests', { cache: 'no-store' })
+      const res = await fetch(`/api/guests?t=${Date.now()}`, { cache: 'no-store' })
       const data = await res.json()
       if (res.ok) setGroups(data.groups)
     } catch {
