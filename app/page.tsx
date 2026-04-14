@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { INVITE_GROUPS, INVITE_GROUP_LABELS, normalizeInviteGroup, type InviteGroup } from '@/lib/email-template'
 
 type Guest = {
   id: string
@@ -9,17 +10,31 @@ type Guest = {
   last_name: string
   email: string | null
   invitation_group: string | null
+  invite_group: string | null
   rsvp_status: string
   invite_sent_at: string | null
 }
 
 type Groups = Record<string, Guest[]>
 
+const SECTION_KEYS: (InviteGroup | 'unassigned')[] = [...INVITE_GROUPS, 'unassigned']
+
+const SECTION_LABELS: Record<InviteGroup | 'unassigned', string> = {
+  ...INVITE_GROUP_LABELS,
+  unassigned: 'Unassigned',
+}
+
+function groupSection(members: Guest[]): InviteGroup | 'unassigned' {
+  const value = members.find((m) => m.invite_group)?.invite_group ?? null
+  return normalizeInviteGroup(value) ?? 'unassigned'
+}
+
 export default function Dashboard() {
   const [groups, setGroups] = useState<Groups>({})
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [sending, setSending] = useState<string | null>(null)
+  const [sendingSection, setSendingSection] = useState<string | null>(null)
   const [sendingAll, setSendingAll] = useState(false)
   const [preview, setPreview] = useState<string | null>(null)
   const [previewHtml, setPreviewHtml] = useState('')
@@ -65,6 +80,20 @@ export default function Dashboard() {
     }
   }
 
+  const sendSection = async (
+    section: InviteGroup | 'unassigned',
+    sectionGroups: [string, Guest[]][]
+  ) => {
+    setSendingSection(section)
+    const unsent = sectionGroups.filter(
+      ([, members]) => !members[0]?.invite_sent_at && members.some((m) => m.email)
+    )
+    for (const [key, members] of unsent) {
+      await sendInvite(key, members)
+    }
+    setSendingSection(null)
+  }
+
   const sendAll = async () => {
     setSendingAll(true)
     const unsent = Object.entries(groups).filter(
@@ -99,6 +128,17 @@ export default function Dashboard() {
   const unsentGroups = groupEntries.filter(
     ([, m]) => !m[0]?.invite_sent_at && m.some((g) => g.email)
   ).length
+
+  // Bucket invitation groups by invite_group section
+  const sections: Record<InviteGroup | 'unassigned', [string, Guest[]][]> = {
+    praanya: [],
+    biswas: [],
+    jain: [],
+    unassigned: [],
+  }
+  for (const entry of groupEntries) {
+    sections[groupSection(entry[1])].push(entry)
+  }
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-12">
@@ -154,97 +194,141 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {/* Group cards */}
-          <div className="space-y-4">
-            {groupEntries.map(([key, members]) => {
-              const emails = members.filter((m) => m.email).map((m) => m.email!)
-              const sent = !!members[0]?.invite_sent_at
-              const isSending = sending === key
+          {/* Sections by invite_group */}
+          <div className="space-y-10">
+            {SECTION_KEYS.map((section) => {
+              const sectionGroups = sections[section]
+              if (sectionGroups.length === 0) return null
+
+              const sectionUnsent = sectionGroups.filter(
+                ([, members]) => !members[0]?.invite_sent_at && members.some((m) => m.email)
+              ).length
+              const sectionSent = sectionGroups.filter(
+                ([, members]) => !!members[0]?.invite_sent_at
+              ).length
+              const sectionGuestCount = sectionGroups.reduce((n, [, m]) => n + m.length, 0)
+              const isSendingThisSection = sendingSection === section
 
               return (
-                <div
-                  key={key}
-                  className={`bg-white rounded-xl border px-6 py-5 transition-colors ${
-                    sent ? 'border-green-200' : 'border-gold/20'
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      {/* Group name */}
-                      <div className="flex items-center gap-2 mb-2">
-                        {sent && <span className="text-green-500 text-sm">&#10003;</span>}
-                        <h3 className="font-bold text-darkdenim truncate">
-                          {members.map((m) => `${m.first_name} ${m.last_name}`).join(', ')}
-                        </h3>
-                      </div>
-
-                      {/* Emails */}
-                      <div className="text-xs text-navy/40 space-x-2">
-                        {emails.length > 0 ? (
-                          emails.map((e) => (
-                            <span key={e} className="inline-block bg-cream rounded px-2 py-0.5">
-                              {e}
-                            </span>
-                          ))
-                        ) : (
-                          <span className="text-red-400">No email addresses</span>
-                        )}
-                      </div>
-
-                      {/* Sent timestamp */}
-                      {sent && (
-                        <p className="text-xs text-green-500 mt-1">
-                          Sent {new Date(members[0].invite_sent_at!).toLocaleString()}
-                        </p>
-                      )}
-
-                      {/* Flash message */}
-                      {flash?.key === key && (
-                        <p className={`text-xs mt-1 ${flash.ok ? 'text-green-600' : 'text-red-500'}`}>
-                          {flash.msg}
-                        </p>
-                      )}
+                <section key={section}>
+                  {/* Section header */}
+                  <div className="flex justify-between items-center mb-4 border-b border-gold/30 pb-3">
+                    <div>
+                      <h2 className="text-xl font-bold text-darkdenim uppercase tracking-wider">
+                        {SECTION_LABELS[section]}
+                      </h2>
+                      <p className="text-xs text-navy/50 mt-1">
+                        {sectionGuestCount} guests &bull; {sectionGroups.length} invitations &bull;{' '}
+                        <span className="text-green-600">{sectionSent} sent</span> &bull;{' '}
+                        <span className="text-orange-500">{sectionUnsent} unsent</span>
+                      </p>
                     </div>
-
-                    {/* Action buttons */}
-                    <div className="flex gap-2 flex-shrink-0">
-                      <button
-                        onClick={() => handlePreview(key, members)}
-                        className="px-3 py-1.5 border border-gold/30 text-navy/60 text-xs uppercase tracking-wider rounded-lg hover:border-navy/40 transition-colors"
-                      >
-                        {preview === key ? 'Hide' : 'Preview'}
-                      </button>
-                      <button
-                        onClick={() => sendInvite(key, members)}
-                        disabled={isSending || emails.length === 0}
-                        className={`px-4 py-1.5 text-xs uppercase tracking-wider rounded-lg transition-colors disabled:opacity-40 ${
-                          sent
-                            ? 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-100'
-                            : 'bg-navy text-white hover:bg-darkdenim'
-                        }`}
-                      >
-                        {isSending ? '...' : sent ? 'Resend' : 'Send'}
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => sendSection(section, sectionGroups)}
+                      disabled={isSendingThisSection || sendingAll || sectionUnsent === 0}
+                      className="px-4 py-2 bg-navy text-white text-xs uppercase tracking-wider rounded-lg hover:bg-darkdenim transition-colors disabled:opacity-40 flex-shrink-0"
+                    >
+                      {isSendingThisSection
+                        ? 'Sending...'
+                        : `Send All Unsent (${sectionUnsent})`}
+                    </button>
                   </div>
 
-                  {/* Email preview */}
-                  {preview === key && (
-                    <div className="mt-4 border-t border-gold/10 pt-4">
-                      <div
-                        className="rounded-lg overflow-hidden border border-gold/10"
-                        style={{ maxHeight: '500px', overflowY: 'auto' }}
-                      >
-                        <iframe
-                          srcDoc={previewHtml}
-                          title="Email Preview"
-                          className="w-full border-0"
-                          style={{ height: '520px' }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
+                  {/* Group cards */}
+                  <div className="space-y-4">
+                    {sectionGroups.map(([key, members]) => {
+                      const emails = members.filter((m) => m.email).map((m) => m.email!)
+                      const sent = !!members[0]?.invite_sent_at
+                      const isSending = sending === key
+
+                      return (
+                        <div
+                          key={key}
+                          className={`bg-white rounded-xl border px-6 py-5 transition-colors ${
+                            sent ? 'border-green-200' : 'border-gold/20'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              {/* Group name */}
+                              <div className="flex items-center gap-2 mb-2">
+                                {sent && <span className="text-green-500 text-sm">&#10003;</span>}
+                                <h3 className="font-bold text-darkdenim truncate">
+                                  {members.map((m) => `${m.first_name} ${m.last_name}`).join(', ')}
+                                </h3>
+                              </div>
+
+                              {/* Emails */}
+                              <div className="text-xs text-navy/40 space-x-2">
+                                {emails.length > 0 ? (
+                                  emails.map((e) => (
+                                    <span key={e} className="inline-block bg-cream rounded px-2 py-0.5">
+                                      {e}
+                                    </span>
+                                  ))
+                                ) : (
+                                  <span className="text-red-400">No email addresses</span>
+                                )}
+                              </div>
+
+                              {/* Sent timestamp */}
+                              {sent && (
+                                <p className="text-xs text-green-500 mt-1">
+                                  Sent {new Date(members[0].invite_sent_at!).toLocaleString()}
+                                </p>
+                              )}
+
+                              {/* Flash message */}
+                              {flash?.key === key && (
+                                <p className={`text-xs mt-1 ${flash.ok ? 'text-green-600' : 'text-red-500'}`}>
+                                  {flash.msg}
+                                </p>
+                              )}
+                            </div>
+
+                            {/* Action buttons */}
+                            <div className="flex gap-2 flex-shrink-0">
+                              <button
+                                onClick={() => handlePreview(key, members)}
+                                className="px-3 py-1.5 border border-gold/30 text-navy/60 text-xs uppercase tracking-wider rounded-lg hover:border-navy/40 transition-colors"
+                              >
+                                {preview === key ? 'Hide' : 'Preview'}
+                              </button>
+                              <button
+                                onClick={() => sendInvite(key, members)}
+                                disabled={isSending || emails.length === 0}
+                                className={`px-4 py-1.5 text-xs uppercase tracking-wider rounded-lg transition-colors disabled:opacity-40 ${
+                                  sent
+                                    ? 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-100'
+                                    : 'bg-navy text-white hover:bg-darkdenim'
+                                }`}
+                              >
+                                {isSending ? '...' : sent ? 'Resend' : 'Send'}
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Email preview */}
+                          {preview === key && (
+                            <div className="mt-4 border-t border-gold/10 pt-4">
+                              <div
+                                className="rounded-lg overflow-hidden border border-gold/10"
+                                style={{ maxHeight: '500px', overflowY: 'auto' }}
+                              >
+                                <iframe
+                                  srcDoc={previewHtml}
+                                  title="Email Preview"
+                                  className="w-full border-0"
+                                  style={{ height: '520px' }}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </section>
               )
             })}
           </div>

@@ -16,18 +16,20 @@ export async function GET(req: NextRequest) {
 
     const { data: members, error } = await supabase
       .from('guests')
-      .select('id, first_name, last_name, email')
+      .select('id, first_name, last_name, email, invite_group')
       .in('id', ids)
 
     if (error || !members || members.length === 0) {
       return NextResponse.json({ error: 'Guests not found' }, { status: 404 })
     }
 
+    const inviteGroup = members.find((m) => m.invite_group)?.invite_group ?? null
+
     const websiteUrl = process.env.WEBSITE_URL || 'https://your-site.vercel.app'
     const websitePassword = process.env.WEBSITE_PASSWORD || 'Forever2026'
     const bgImageUrl = `${websiteUrl}/assets/bg-main.jpeg`
 
-    const html = generateEmailHTML(members, websiteUrl, websitePassword, bgImageUrl)
+    const html = generateEmailHTML(members, websiteUrl, websitePassword, bgImageUrl, inviteGroup)
 
     return NextResponse.json({ html })
   } catch (err) {
