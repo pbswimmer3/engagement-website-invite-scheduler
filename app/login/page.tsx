@@ -7,9 +7,14 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const from = searchParams.get('from') ?? '/'
+  const setupMissing = searchParams.get('setup') === '1'
 
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+  const [error, setError] = useState(
+    setupMissing
+      ? 'SITE_PASSWORD env var is not set. Configure it in Vercel → Project Settings → Environment Variables, then redeploy.'
+      : ''
+  )
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
