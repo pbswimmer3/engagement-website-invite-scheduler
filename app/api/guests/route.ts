@@ -9,7 +9,8 @@ export async function GET() {
 
     const { data: guests, error } = await supabase
       .from('guests')
-      .select('id, first_name, last_name, email, invitation_group, rsvp_status, invite_sent_at')
+      .select('id, first_name, last_name, email, invitation_group, invite_group, rsvp_status, invite_sent_at')
+      .order('invite_group', { nullsFirst: false })
       .order('invitation_group', { nullsFirst: false })
       .order('first_name')
 

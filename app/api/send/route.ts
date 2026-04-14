@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     // Fetch the group members
     const { data: members, error } = await supabase
       .from('guests')
-      .select('id, first_name, last_name, email')
+      .select('id, first_name, last_name, email, invite_group')
       .in('id', memberIds)
 
     if (error || !members || members.length === 0) {
@@ -32,12 +32,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No email addresses in this group' }, { status: 400 })
     }
 
+    // All members of an invitation group should share the same invite_group;
+    // use the first member's value to pick the template.
+    const inviteGroup = members.find((m) => m.invite_group)?.invite_group ?? null
+
     // Build the email
     const websiteUrl = process.env.WEBSITE_URL || 'https://your-site.vercel.app'
     const websitePassword = process.env.WEBSITE_PASSWORD || 'Forever2026'
     const bgImageUrl = `${websiteUrl}/assets/bg-main.jpeg`
 
-    const html = generateEmailHTML(members, websiteUrl, websitePassword, bgImageUrl)
+    const html = generateEmailHTML(members, websiteUrl, websitePassword, bgImageUrl, inviteGroup)
     const subject = generateSubject(members)
 
     // Create Gmail transporter
