@@ -1,6 +1,6 @@
 # Engagement Invite Sender
 
-A simple admin app to send email invitations to guests for Aanya & Prad's engagement party. Connects to the same Supabase database as the engagement website, auto-generates personalized HTML emails per invitation group, and sends them via Gmail with one click.
+A simple admin app to send email invitations to guests for Aanya & Prad's engagement party. Connects to the same Supabase database as the engagement website, auto-generates personalized HTML emails per invitation group, and sends them via Gmail with one click. 
 
 ## Features 
 
