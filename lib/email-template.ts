@@ -171,7 +171,7 @@ function generateEmailHTML_praanya(
 
               <!-- FAQ Note -->
               <p style="margin:0 0 16px; font-size:14px; line-height:1.6; color:#666; font-style:italic;">
-                Please refer to the FAQ section on the website for additional information on dress code and travel.
+                Please refer to the FAQ section on the website for additional information, including dress code and travel.
               </p>
 
 
@@ -303,7 +303,7 @@ function generateEmailHTML_biswas(
 
               <!-- FAQ Note -->
               <p style="margin:0 0 16px; font-size:14px; line-height:1.6; color:#666; font-style:italic;">
-                Please refer to the FAQ section on the website for additional information on dress code and travel.
+                Please refer to the FAQ section on the website for additional information, including dress code and travel.
               </p>
 
 
@@ -435,7 +435,7 @@ function generateEmailHTML_jain(
 
               <!-- FAQ Note -->
               <p style="margin:0 0 16px; font-size:14px; line-height:1.6; color:#666; font-style:italic;">
-                Please refer to the FAQ section on the website for additional information on dress code and travel.
+                Please refer to the FAQ section on the website for additional information, including dress code and travel.
               </p>
 
 
