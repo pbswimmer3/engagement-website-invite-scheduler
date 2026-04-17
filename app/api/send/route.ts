@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 import { createAdminClient } from '@/lib/supabase'
 import {
+  ensureAbsoluteUrl,
   generateEmailHTML,
   generateSubject,
   getFaqUrl,
@@ -45,8 +46,12 @@ export async function POST(req: NextRequest) {
 
     // Build the email
     const websiteUrl = process.env.WEBSITE_URL || 'https://your-site.vercel.app'
-    const bgImageUrl = `${websiteUrl}/assets/bg-main.jpeg`
-    const faqUrl = getFaqUrl() || websiteUrl
+    // Background image is hosted by this scheduler app (public/bg-main.jpeg),
+    // so point at this app's own origin rather than the guest-facing
+    // WEBSITE_URL (which lives on a different domain and does not serve the
+    // file).
+    const bgImageUrl = `${req.nextUrl.origin}/bg-main.jpeg`
+    const faqUrl = getFaqUrl() || ensureAbsoluteUrl(websiteUrl)
 
     const normalizedGroup = normalizeInviteGroup(inviteGroup)
     const html = generateEmailHTML(members, websiteUrl, bgImageUrl, inviteGroup, faqUrl)

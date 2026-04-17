@@ -91,14 +91,25 @@ export function getSenderNameForGroup(group: InviteGroup | null): string {
 }
 
 // FAQ page URL, configured via FAQ_URL env var (set in Vercel). Falls back
-// to the main website URL if unset.
+// to the main website URL if unset. Always returns an absolute URL so the
+// link works both in the dashboard preview iframe and in sent emails — if
+// the env var is set without a scheme (e.g. `www.aanyaprad.com/faq`) we
+// prepend `https://` so it isn't treated as a relative path.
 export function getFaqUrl(): string {
-  return (
+  const raw =
     process.env.FAQ_URL ||
     process.env.NEXT_PUBLIC_FAQ_URL ||
     process.env.WEBSITE_URL ||
     ''
-  )
+  return ensureAbsoluteUrl(raw)
+}
+
+export function ensureAbsoluteUrl(url: string): string {
+  const trimmed = url.trim()
+  if (!trimmed) return ''
+  if (/^[a-z][a-z0-9+.-]*:\/\//i.test(trimmed)) return trimmed
+  if (trimmed.startsWith('//')) return `https:${trimmed}`
+  return `https://${trimmed.replace(/^\/+/, '')}`
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
