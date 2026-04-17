@@ -67,7 +67,7 @@ function generateEmailHTML_praanya(
                   Aanya &amp; Prad's
                 </h1>
                 <h2 style="margin:0; font-size:22px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#C9A96E;">
-                  Engagement Party
+                  Engagement Celebration
                 </h2>
                 <div style="width:60px; height:1px; background:#C9A96E; margin:20px auto 0;"></div>
               </div>
@@ -123,9 +123,9 @@ function generateEmailHTML_praanya(
               </p>
               ` : ''}
 
-              <!-- Dress Code Note -->
+              <!-- FAQ Note -->
               <p style="margin:0 0 16px; font-size:14px; line-height:1.6; color:#666; font-style:italic;">
-                Dress code &mdash; Men: Western Formal &bull; Women: Indian or Indo-Western
+                Please refer to the FAQ section on the website for additional information on dress code and travel.
               </p>
 
 
@@ -199,7 +199,7 @@ function generateEmailHTML_biswas(
                   Aanya &amp; Prad's
                 </h1>
                 <h2 style="margin:0; font-size:22px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#C9A96E;">
-                  Engagement Party
+                  Engagement Celebration
                 </h2>
                 <div style="width:60px; height:1px; background:#C9A96E; margin:20px auto 0;"></div>
               </div>
@@ -255,9 +255,9 @@ function generateEmailHTML_biswas(
               </p>
               ` : ''}
 
-              <!-- Dress Code Note -->
+              <!-- FAQ Note -->
               <p style="margin:0 0 16px; font-size:14px; line-height:1.6; color:#666; font-style:italic;">
-                Dress code &mdash; Men: Western Formal &bull; Women: Indian or Indo-Western
+                Please refer to the FAQ section on the website for additional information on dress code and travel.
               </p>
 
 
@@ -331,7 +331,7 @@ function generateEmailHTML_jain(
                   Aanya &amp; Prad's
                 </h1>
                 <h2 style="margin:0; font-size:22px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#C9A96E;">
-                  Engagement Party
+                  Engagement Celebration
                 </h2>
                 <div style="width:60px; height:1px; background:#C9A96E; margin:20px auto 0;"></div>
               </div>
@@ -387,9 +387,9 @@ function generateEmailHTML_jain(
               </p>
               ` : ''}
 
-              <!-- Dress Code Note -->
+              <!-- FAQ Note -->
               <p style="margin:0 0 16px; font-size:14px; line-height:1.6; color:#666; font-style:italic;">
-                Dress code &mdash; Men: Western Formal &bull; Women: Indian or Indo-Western
+                Please refer to the FAQ section on the website for additional information on dress code and travel.
               </p>
 
 
@@ -452,5 +452,5 @@ export function generateEmailHTML(
 
 export function generateSubject(members: Member[]) {
   const names = members.map((m) => m.first_name).join(' & ')
-  return `${names} — You're Invited to Aanya & Prad's Engagement Party!`
+  return `${names} — You're Invited to Aanya & Prad's Engagement Celebration!`
 }
