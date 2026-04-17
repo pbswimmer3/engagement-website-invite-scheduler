@@ -75,6 +75,31 @@ export function getGmailCredentialsForGroup(group: InviteGroup | null): {
       }
   }
 }
+
+// Display name shown in the "From" header of outgoing emails for each
+// invite group.
+export function getSenderNameForGroup(group: InviteGroup | null): string {
+  switch (group) {
+    case 'biswas':
+      return 'Roshni & Deb'
+    case 'jain':
+      return 'Amrit & Jolly'
+    case 'praanya':
+    default:
+      return 'Aanya & Prad'
+  }
+}
+
+// FAQ page URL, configured via FAQ_URL env var (set in Vercel). Falls back
+// to the main website URL if unset.
+export function getFaqUrl(): string {
+  return (
+    process.env.FAQ_URL ||
+    process.env.NEXT_PUBLIC_FAQ_URL ||
+    process.env.WEBSITE_URL ||
+    ''
+  )
+}
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ─── TEMPLATE: PRAANYA ───────────────────────────────────────────────────────
@@ -83,7 +108,8 @@ function generateEmailHTML_praanya(
   members: Member[],
   websiteUrl: string,
   websitePassword: string,
-  bgImageUrl: string
+  bgImageUrl: string,
+  faqUrl: string
 ) {
   const names = members.map((m) => m.first_name).join(' & ')
   const allNames = members.map((m) => `${m.first_name} ${m.last_name}`).join(', ')
@@ -171,7 +197,7 @@ function generateEmailHTML_praanya(
 
               <!-- FAQ Note -->
               <p style="margin:0 0 16px; font-size:14px; line-height:1.6; color:#666; font-style:italic;">
-                Please refer to the FAQ section on the website for additional information, including dress code and travel.
+                Please refer to the ${faqUrl ? `<a href="${faqUrl}" target="_blank" style="color:#1B2A4A; text-decoration:underline;">FAQ</a>` : 'FAQ'} section on the website for additional information, including dress code and travel.
               </p>
 
 
@@ -215,7 +241,8 @@ function generateEmailHTML_biswas(
   members: Member[],
   websiteUrl: string,
   websitePassword: string,
-  bgImageUrl: string
+  bgImageUrl: string,
+  faqUrl: string
 ) {
   const names = members.map((m) => m.first_name).join(' & ')
   const allNames = members.map((m) => `${m.first_name} ${m.last_name}`).join(', ')
@@ -303,7 +330,7 @@ function generateEmailHTML_biswas(
 
               <!-- FAQ Note -->
               <p style="margin:0 0 16px; font-size:14px; line-height:1.6; color:#666; font-style:italic;">
-                Please refer to the FAQ section on the website for additional information, including dress code and travel.
+                Please refer to the ${faqUrl ? `<a href="${faqUrl}" target="_blank" style="color:#1B2A4A; text-decoration:underline;">FAQ</a>` : 'FAQ'} section on the website for additional information, including dress code and travel.
               </p>
 
 
@@ -347,7 +374,8 @@ function generateEmailHTML_jain(
   members: Member[],
   websiteUrl: string,
   websitePassword: string,
-  bgImageUrl: string
+  bgImageUrl: string,
+  faqUrl: string
 ) {
   const names = members.map((m) => m.first_name).join(' & ')
   const allNames = members.map((m) => `${m.first_name} ${m.last_name}`).join(', ')
@@ -435,7 +463,7 @@ function generateEmailHTML_jain(
 
               <!-- FAQ Note -->
               <p style="margin:0 0 16px; font-size:14px; line-height:1.6; color:#666; font-style:italic;">
-                Please refer to the FAQ section on the website for additional information, including dress code and travel.
+                Please refer to the ${faqUrl ? `<a href="${faqUrl}" target="_blank" style="color:#1B2A4A; text-decoration:underline;">FAQ</a>` : 'FAQ'} section on the website for additional information, including dress code and travel.
               </p>
 
 
@@ -482,23 +510,23 @@ export function generateEmailHTML(
   members: Member[],
   websiteUrl: string,
   bgImageUrl: string,
-  inviteGroup: InviteGroup | string | null | undefined
+  inviteGroup: InviteGroup | string | null | undefined,
+  faqUrl: string = getFaqUrl()
 ) {
   const group = normalizeInviteGroup(typeof inviteGroup === 'string' ? inviteGroup : inviteGroup ?? null)
   const websitePassword = getWebsitePasswordForGroup(group)
 
   switch (group) {
     case 'biswas':
-      return generateEmailHTML_biswas(members, websiteUrl, websitePassword, bgImageUrl)
+      return generateEmailHTML_biswas(members, websiteUrl, websitePassword, bgImageUrl, faqUrl)
     case 'jain':
-      return generateEmailHTML_jain(members, websiteUrl, websitePassword, bgImageUrl)
+      return generateEmailHTML_jain(members, websiteUrl, websitePassword, bgImageUrl, faqUrl)
     case 'praanya':
     default:
-      return generateEmailHTML_praanya(members, websiteUrl, websitePassword, bgImageUrl)
+      return generateEmailHTML_praanya(members, websiteUrl, websitePassword, bgImageUrl, faqUrl)
   }
 }
 
-export function generateSubject(members: Member[]) {
-  const names = members.map((m) => m.first_name).join(' & ')
-  return `${names} — You're Invited to Aanya & Prad's Engagement Celebration!`
+export function generateSubject(_members?: Member[]) {
+  return `You're Invited to Aanya & Prad's Engagement Celebration!`
 }

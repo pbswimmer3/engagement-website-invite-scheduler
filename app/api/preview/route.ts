@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
-import { generateEmailHTML } from '@/lib/email-template'
+import { generateEmailHTML, getFaqUrl } from '@/lib/email-template'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,8 +27,9 @@ export async function GET(req: NextRequest) {
 
     const websiteUrl = process.env.WEBSITE_URL || 'https://your-site.vercel.app'
     const bgImageUrl = `${websiteUrl}/assets/bg-main.jpeg`
+    const faqUrl = getFaqUrl() || websiteUrl
 
-    const html = generateEmailHTML(members, websiteUrl, bgImageUrl, inviteGroup)
+    const html = generateEmailHTML(members, websiteUrl, bgImageUrl, inviteGroup, faqUrl)
 
     return NextResponse.json({ html })
   } catch (err) {

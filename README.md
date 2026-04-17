@@ -86,6 +86,7 @@ That's it. Your existing guest data is untouched.
 | `GMAIL_USER` | `your.email@gmail.com` | Optional fallback sender if a group-specific pair above is not set |
 | `GMAIL_APP_PASSWORD` | `abcd efgh ijkl mnop` | Optional fallback app password (paired with `GMAIL_USER`) |
 | `WEBSITE_URL` | `https://your-engagement-site.vercel.app` | Your deployed engagement website URL |
+| `FAQ_URL` | `https://your-engagement-site.vercel.app/faq` | URL used for the hyperlinked **FAQ** word in all invite templates (falls back to `WEBSITE_URL`) |
 | `WEBSITE_PASSWORD_PRAANYA` | `XXX` | Password shown at the bottom of the Praanya invite template |
 | `WEBSITE_PASSWORD_BISWAS` | `XXX` | Password shown at the bottom of the Biswas invite template |
 | `WEBSITE_PASSWORD_JAIN` | `XXX` | Password shown at the bottom of the Jain invite template |
@@ -143,6 +144,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `GMAIL_USER` | No | Optional fallback sender used when a group-specific pair is not set |
 | `GMAIL_APP_PASSWORD` | No | Optional fallback app password (paired with `GMAIL_USER`) |
 | `WEBSITE_URL` | Yes | Your engagement website URL (for the RSVP link) |
+| `FAQ_URL` | No | URL used to hyperlink the word **FAQ** in invite templates (falls back to `WEBSITE_URL`) |
 | `WEBSITE_PASSWORD_PRAANYA` | Yes* | Password shown at the bottom of the Praanya invite template |
 | `WEBSITE_PASSWORD_BISWAS` | Yes* | Password shown at the bottom of the Biswas invite template |
 | `WEBSITE_PASSWORD_JAIN` | Yes* | Password shown at the bottom of the Jain invite template |
