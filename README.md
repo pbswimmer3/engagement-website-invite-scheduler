@@ -80,7 +80,10 @@ That's it. Your existing guest data is untouched.
 | `GMAIL_USER` | `your.email@gmail.com` | Your Gmail address |
 | `GMAIL_APP_PASSWORD` | `abcd efgh ijkl mnop` | From Step 1 above |
 | `WEBSITE_URL` | `https://your-engagement-site.vercel.app` | Your deployed engagement website URL |
-| `WEBSITE_PASSWORD` | `Forever2026` | The password guests enter on the website |
+| `WEBSITE_PASSWORD_PRAANYA` | `PraanyaForever2026` | Password shown at the bottom of the Praanya invite template |
+| `WEBSITE_PASSWORD_BISWAS` | `BiswasForever2026` | Password shown at the bottom of the Biswas invite template |
+| `WEBSITE_PASSWORD_JAIN` | `JainForever2026` | Password shown at the bottom of the Jain invite template |
+| `WEBSITE_PASSWORD` | `Forever2026` | Optional fallback used only if a group-specific password above is not set |
 
 6. Click **Deploy**
 7. Once deployed, open the URL — you'll see the invite dashboard
@@ -128,7 +131,12 @@ Open [http://localhost:3000](http://localhost:3000).
 | `GMAIL_USER` | Yes | Gmail address to send from |
 | `GMAIL_APP_PASSWORD` | Yes | Gmail App Password (NOT your login password) |
 | `WEBSITE_URL` | Yes | Your engagement website URL (for the RSVP link) |
-| `WEBSITE_PASSWORD` | Yes | Site password included in the email so guests can log in |
+| `WEBSITE_PASSWORD_PRAANYA` | Yes* | Password shown at the bottom of the Praanya invite template |
+| `WEBSITE_PASSWORD_BISWAS` | Yes* | Password shown at the bottom of the Biswas invite template |
+| `WEBSITE_PASSWORD_JAIN` | Yes* | Password shown at the bottom of the Jain invite template |
+| `WEBSITE_PASSWORD` | No | Optional fallback used when a group-specific password is not set |
+
+\* Each template will use its group-specific password if set; otherwise it falls back to `WEBSITE_PASSWORD`. Set either all three group-specific vars (for distinct passwords per family) or just `WEBSITE_PASSWORD` (same password everywhere).
 
 ---
 
