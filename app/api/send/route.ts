@@ -4,7 +4,9 @@ import { createAdminClient } from '@/lib/supabase'
 import {
   generateEmailHTML,
   generateSubject,
+  getFaqUrl,
   getGmailCredentialsForGroup,
+  getSenderNameForGroup,
   normalizeInviteGroup,
 } from '@/lib/email-template'
 
@@ -44,15 +46,16 @@ export async function POST(req: NextRequest) {
     // Build the email
     const websiteUrl = process.env.WEBSITE_URL || 'https://your-site.vercel.app'
     const bgImageUrl = `${websiteUrl}/assets/bg-main.jpeg`
+    const faqUrl = getFaqUrl() || websiteUrl
 
-    const html = generateEmailHTML(members, websiteUrl, bgImageUrl, inviteGroup)
+    const normalizedGroup = normalizeInviteGroup(inviteGroup)
+    const html = generateEmailHTML(members, websiteUrl, bgImageUrl, inviteGroup, faqUrl)
     const subject = generateSubject(members)
+    const senderName = getSenderNameForGroup(normalizedGroup)
 
     // Pick the Gmail sender account for this invite group (Praanya / Biswas /
     // Jain each have their own GMAIL_USER_* / GMAIL_APP_PASSWORD_* env vars).
-    const { user: gmailUser, pass: gmailPass } = getGmailCredentialsForGroup(
-      normalizeInviteGroup(inviteGroup)
-    )
+    const { user: gmailUser, pass: gmailPass } = getGmailCredentialsForGroup(normalizedGroup)
 
     if (!gmailUser || !gmailPass) {
       return NextResponse.json(
@@ -72,7 +75,7 @@ export async function POST(req: NextRequest) {
 
     // Send with all recipients BCC'd
     await transporter.sendMail({
-      from: `"Aanya & Prad" <${gmailUser}>`,
+      from: `"${senderName}" <${gmailUser}>`,
       to: gmailUser,   // send to the sender account
       bcc: emails,     // all group members BCC'd
       subject,
