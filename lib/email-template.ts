@@ -327,7 +327,7 @@ function generateEmailHTML_biswas(
                 With love,
               </p>
               <p style="margin:0; font-size:18px; color:#FFFFFF;">
-                Aanya &amp; Prad
+                The Biswas &amp; Jain Families
               </p>
             </td>
           </tr>
@@ -459,7 +459,7 @@ function generateEmailHTML_jain(
                 With love,
               </p>
               <p style="margin:0; font-size:18px; color:#FFFFFF;">
-                Aanya &amp; Prad
+                The Biswas &amp; Jain Families
               </p>
             </td>
           </tr>
