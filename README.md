@@ -86,10 +86,10 @@ That's it. Your existing guest data is untouched.
 | `GMAIL_USER` | `your.email@gmail.com` | Optional fallback sender if a group-specific pair above is not set |
 | `GMAIL_APP_PASSWORD` | `abcd efgh ijkl mnop` | Optional fallback app password (paired with `GMAIL_USER`) |
 | `WEBSITE_URL` | `https://your-engagement-site.vercel.app` | Your deployed engagement website URL |
-| `WEBSITE_PASSWORD_PRAANYA` | `PraanyaForever2026` | Password shown at the bottom of the Praanya invite template |
-| `WEBSITE_PASSWORD_BISWAS` | `BiswasForever2026` | Password shown at the bottom of the Biswas invite template |
-| `WEBSITE_PASSWORD_JAIN` | `JainForever2026` | Password shown at the bottom of the Jain invite template |
-| `WEBSITE_PASSWORD` | `Forever2026` | Optional fallback used only if a group-specific password above is not set |
+| `WEBSITE_PASSWORD_PRAANYA` | `XXX` | Password shown at the bottom of the Praanya invite template |
+| `WEBSITE_PASSWORD_BISWAS` | `XXX` | Password shown at the bottom of the Biswas invite template |
+| `WEBSITE_PASSWORD_JAIN` | `XXX` | Password shown at the bottom of the Jain invite template |
+| `WEBSITE_PASSWORD` | `XXX` | Optional fallback used only if a group-specific password above is not set |
 
 6. Click **Deploy**
 7. Once deployed, open the URL — you'll see the invite dashboard
