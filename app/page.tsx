@@ -16,6 +16,7 @@ type Guest = {
 }
 
 type Groups = Record<string, Guest[]>
+type SenderEmails = Partial<Record<InviteGroup, string | null>>
 
 const SECTION_KEYS: (InviteGroup | 'unassigned')[] = [...INVITE_GROUPS, 'unassigned']
 
@@ -29,8 +30,44 @@ function groupSection(members: Guest[]): InviteGroup | 'unassigned' {
   return normalizeInviteGroup(value) ?? 'unassigned'
 }
 
+type SortKey = 'first_name' | 'last_name'
+type SortDir = 'asc' | 'desc'
+
+function compareGuests(a: Guest, b: Guest, key: SortKey, dir: SortDir): number {
+  const av = (a[key] ?? '').toLowerCase()
+  const bv = (b[key] ?? '').toLowerCase()
+  const cmp = av.localeCompare(bv)
+  return dir === 'asc' ? cmp : -cmp
+}
+
+function sortMembers(members: Guest[], key: SortKey, dir: SortDir): Guest[] {
+  return [...members].sort((a, b) => compareGuests(a, b, key, dir))
+}
+
+function sortGroupEntries(
+  entries: [string, Guest[]][],
+  key: SortKey,
+  dir: SortDir
+): [string, Guest[]][] {
+  // Sort members within each group, then sort the groups by their first
+  // member's chosen field so the card order matches the displayed name.
+  const withSortedMembers: [string, Guest[]][] = entries.map(([k, members]) => [
+    k,
+    sortMembers(members, key, dir),
+  ])
+  return withSortedMembers.sort(([, a], [, b]) => {
+    const aFirst = a[0]
+    const bFirst = b[0]
+    if (!aFirst && !bFirst) return 0
+    if (!aFirst) return 1
+    if (!bFirst) return -1
+    return compareGuests(aFirst, bFirst, key, dir)
+  })
+}
+
 export default function Dashboard() {
   const [groups, setGroups] = useState<Groups>({})
+  const [senderEmails, setSenderEmails] = useState<SenderEmails>({})
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [sending, setSending] = useState<string | null>(null)
@@ -39,13 +76,18 @@ export default function Dashboard() {
   const [preview, setPreview] = useState<string | null>(null)
   const [previewHtml, setPreviewHtml] = useState('')
   const [flash, setFlash] = useState<{ key: string; ok: boolean; msg: string } | null>(null)
+  const [sortKey, setSortKey] = useState<SortKey>('first_name')
+  const [sortDir, setSortDir] = useState<SortDir>('asc')
 
   const fetchGuests = async () => {
     setRefreshing(true)
     try {
       const res = await fetch(`/api/guests?t=${Date.now()}`, { cache: 'no-store' })
       const data = await res.json()
-      if (res.ok) setGroups(data.groups)
+      if (res.ok) {
+        setGroups(data.groups)
+        setSenderEmails(data.senderEmails ?? {})
+      }
     } catch {
       console.error('Failed to fetch guests')
     } finally {
@@ -129,7 +171,8 @@ export default function Dashboard() {
     ([, m]) => !m[0]?.invite_sent_at && m.some((g) => g.email)
   ).length
 
-  // Bucket invitation groups by invite_group section
+  // Bucket invitation groups by invite_group section, then apply the chosen
+  // sort within each section (and within each group's members).
   const sections: Record<InviteGroup | 'unassigned', [string, Guest[]][]> = {
     praanya: [],
     biswas: [],
@@ -138,6 +181,9 @@ export default function Dashboard() {
   }
   for (const entry of groupEntries) {
     sections[groupSection(entry[1])].push(entry)
+  }
+  for (const key of SECTION_KEYS) {
+    sections[key] = sortGroupEntries(sections[key], sortKey, sortDir)
   }
 
   return (
@@ -194,6 +240,52 @@ export default function Dashboard() {
             </button>
           </div>
 
+          {/* Sort controls */}
+          <div className="flex flex-wrap items-center gap-2 mb-6 text-xs uppercase tracking-wider">
+            <span className="text-navy/50 mr-1">Sort by</span>
+            <button
+              onClick={() => setSortKey('first_name')}
+              className={`px-3 py-1.5 rounded-lg border transition-colors ${
+                sortKey === 'first_name'
+                  ? 'bg-navy text-white border-navy'
+                  : 'border-gold/30 text-navy/60 hover:border-navy/40'
+              }`}
+            >
+              First Name
+            </button>
+            <button
+              onClick={() => setSortKey('last_name')}
+              className={`px-3 py-1.5 rounded-lg border transition-colors ${
+                sortKey === 'last_name'
+                  ? 'bg-navy text-white border-navy'
+                  : 'border-gold/30 text-navy/60 hover:border-navy/40'
+              }`}
+            >
+              Last Name
+            </button>
+            <span className="mx-2 text-gold">|</span>
+            <button
+              onClick={() => setSortDir('asc')}
+              className={`px-3 py-1.5 rounded-lg border transition-colors ${
+                sortDir === 'asc'
+                  ? 'bg-navy text-white border-navy'
+                  : 'border-gold/30 text-navy/60 hover:border-navy/40'
+              }`}
+            >
+              Asc &uarr;
+            </button>
+            <button
+              onClick={() => setSortDir('desc')}
+              className={`px-3 py-1.5 rounded-lg border transition-colors ${
+                sortDir === 'desc'
+                  ? 'bg-navy text-white border-navy'
+                  : 'border-gold/30 text-navy/60 hover:border-navy/40'
+              }`}
+            >
+              Desc &darr;
+            </button>
+          </div>
+
           {/* Sections by invite_group */}
           <div className="space-y-10">
             {SECTION_KEYS.map((section) => {
@@ -209,6 +301,9 @@ export default function Dashboard() {
               const sectionGuestCount = sectionGroups.reduce((n, [, m]) => n + m.length, 0)
               const isSendingThisSection = sendingSection === section
 
+              const sectionSender =
+                section === 'unassigned' ? null : senderEmails[section] ?? null
+
               return (
                 <section key={section}>
                   {/* Section header */}
@@ -222,6 +317,18 @@ export default function Dashboard() {
                         <span className="text-green-600">{sectionSent} sent</span> &bull;{' '}
                         <span className="text-orange-500">{sectionUnsent} unsent</span>
                       </p>
+                      {section !== 'unassigned' && (
+                        <p className="text-xs text-navy/50 mt-1">
+                          Sending from:{' '}
+                          {sectionSender ? (
+                            <span className="font-mono text-navy/70">{sectionSender}</span>
+                          ) : (
+                            <span className="text-red-400">
+                              not configured (set GMAIL_USER_{section.toUpperCase()})
+                            </span>
+                          )}
+                        </p>
+                      )}
                     </div>
                     <button
                       onClick={() => sendSection(section, sectionGroups)}

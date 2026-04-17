@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
+import { INVITE_GROUPS, getGmailCredentialsForGroup } from '@/lib/email-template'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,8 +26,16 @@ export async function GET() {
       groups[key].push(guest)
     }
 
+    // Sender Gmail address per invite group (addresses only — never expose app
+    // passwords to the client). Falls back to the shared GMAIL_USER if no
+    // group-specific sender is configured.
+    const senderEmails: Record<string, string | null> = {}
+    for (const group of INVITE_GROUPS) {
+      senderEmails[group] = getGmailCredentialsForGroup(group).user ?? null
+    }
+
     return NextResponse.json(
-      { groups },
+      { groups, senderEmails },
       { headers: { 'Cache-Control': 'no-store, max-age=0' } }
     )
   } catch (err) {
