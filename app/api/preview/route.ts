@@ -26,10 +26,9 @@ export async function GET(req: NextRequest) {
     const inviteGroup = members.find((m) => m.invite_group)?.invite_group ?? null
 
     const websiteUrl = process.env.WEBSITE_URL || 'https://your-site.vercel.app'
-    const websitePassword = process.env.WEBSITE_PASSWORD || 'Forever2026'
     const bgImageUrl = `${websiteUrl}/assets/bg-main.jpeg`
 
-    const html = generateEmailHTML(members, websiteUrl, websitePassword, bgImageUrl, inviteGroup)
+    const html = generateEmailHTML(members, websiteUrl, bgImageUrl, inviteGroup)
 
     return NextResponse.json({ html })
   } catch (err) {

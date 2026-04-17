@@ -29,6 +29,23 @@ export function normalizeInviteGroup(value: string | null | undefined): InviteGr
   if (v === 'praanya' || v === 'biswas' || v === 'jain') return v
   return null
 }
+
+// Picks the website password for an invite group from environment variables.
+// Falls back to WEBSITE_PASSWORD (and then a hard-coded default) if the
+// group-specific variable is not set, so existing deployments keep working.
+export function getWebsitePasswordForGroup(group: InviteGroup | null): string {
+  const fallback = process.env.WEBSITE_PASSWORD || 'Forever2026'
+  switch (group) {
+    case 'biswas':
+      return process.env.WEBSITE_PASSWORD_BISWAS || fallback
+    case 'jain':
+      return process.env.WEBSITE_PASSWORD_JAIN || fallback
+    case 'praanya':
+      return process.env.WEBSITE_PASSWORD_PRAANYA || fallback
+    default:
+      return process.env.WEBSITE_PASSWORD_PRAANYA || fallback
+  }
+}
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ─── TEMPLATE: PRAANYA ───────────────────────────────────────────────────────
@@ -428,16 +445,18 @@ function generateEmailHTML_jain(
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ─── ROUTER ──────────────────────────────────────────────────────────────────
-// Picks the right template based on `invite_group`. Falls back to the praanya
-// template if the value is missing or unrecognized.
+// Picks the right template based on `invite_group`. Each template receives
+// the website password for its group (configured via env vars — see
+// `getWebsitePasswordForGroup`). Falls back to the praanya template if the
+// value is missing or unrecognized.
 export function generateEmailHTML(
   members: Member[],
   websiteUrl: string,
-  websitePassword: string,
   bgImageUrl: string,
   inviteGroup: InviteGroup | string | null | undefined
 ) {
   const group = normalizeInviteGroup(typeof inviteGroup === 'string' ? inviteGroup : inviteGroup ?? null)
+  const websitePassword = getWebsitePasswordForGroup(group)
 
   switch (group) {
     case 'biswas':

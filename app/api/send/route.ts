@@ -38,10 +38,9 @@ export async function POST(req: NextRequest) {
 
     // Build the email
     const websiteUrl = process.env.WEBSITE_URL || 'https://your-site.vercel.app'
-    const websitePassword = process.env.WEBSITE_PASSWORD || 'Forever2026'
     const bgImageUrl = `${websiteUrl}/assets/bg-main.jpeg`
 
-    const html = generateEmailHTML(members, websiteUrl, websitePassword, bgImageUrl, inviteGroup)
+    const html = generateEmailHTML(members, websiteUrl, bgImageUrl, inviteGroup)
     const subject = generateSubject(members)
 
     // Create Gmail transporter
