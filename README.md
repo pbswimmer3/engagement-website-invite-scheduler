@@ -77,8 +77,14 @@ That's it. Your existing guest data is untouched.
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://xxxxx.supabase.co` | Same as your engagement website |
 | `SUPABASE_SERVICE_ROLE_KEY` | `eyJ...` | Same as your engagement website |
-| `GMAIL_USER` | `your.email@gmail.com` | Your Gmail address |
-| `GMAIL_APP_PASSWORD` | `abcd efgh ijkl mnop` | From Step 1 above |
+| `GMAIL_USER_PRAANYA` | `praanya.email@gmail.com` | Gmail address the Praanya template sends from |
+| `GMAIL_APP_PASSWORD_PRAANYA` | `abcd efgh ijkl mnop` | App password for `GMAIL_USER_PRAANYA` |
+| `GMAIL_USER_BISWAS` | `biswas.email@gmail.com` | Gmail address the Biswas template sends from |
+| `GMAIL_APP_PASSWORD_BISWAS` | `abcd efgh ijkl mnop` | App password for `GMAIL_USER_BISWAS` |
+| `GMAIL_USER_JAIN` | `jain.email@gmail.com` | Gmail address the Jain template sends from |
+| `GMAIL_APP_PASSWORD_JAIN` | `abcd efgh ijkl mnop` | App password for `GMAIL_USER_JAIN` |
+| `GMAIL_USER` | `your.email@gmail.com` | Optional fallback sender if a group-specific pair above is not set |
+| `GMAIL_APP_PASSWORD` | `abcd efgh ijkl mnop` | Optional fallback app password (paired with `GMAIL_USER`) |
 | `WEBSITE_URL` | `https://your-engagement-site.vercel.app` | Your deployed engagement website URL |
 | `WEBSITE_PASSWORD_PRAANYA` | `PraanyaForever2026` | Password shown at the bottom of the Praanya invite template |
 | `WEBSITE_PASSWORD_BISWAS` | `BiswasForever2026` | Password shown at the bottom of the Biswas invite template |
@@ -128,8 +134,14 @@ Open [http://localhost:3000](http://localhost:3000).
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Your Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase service role key (bypasses RLS) |
-| `GMAIL_USER` | Yes | Gmail address to send from |
-| `GMAIL_APP_PASSWORD` | Yes | Gmail App Password (NOT your login password) |
+| `GMAIL_USER_PRAANYA` | Yes† | Gmail address the Praanya template sends from |
+| `GMAIL_APP_PASSWORD_PRAANYA` | Yes† | App password for `GMAIL_USER_PRAANYA` |
+| `GMAIL_USER_BISWAS` | Yes† | Gmail address the Biswas template sends from |
+| `GMAIL_APP_PASSWORD_BISWAS` | Yes† | App password for `GMAIL_USER_BISWAS` |
+| `GMAIL_USER_JAIN` | Yes† | Gmail address the Jain template sends from |
+| `GMAIL_APP_PASSWORD_JAIN` | Yes† | App password for `GMAIL_USER_JAIN` |
+| `GMAIL_USER` | No | Optional fallback sender used when a group-specific pair is not set |
+| `GMAIL_APP_PASSWORD` | No | Optional fallback app password (paired with `GMAIL_USER`) |
 | `WEBSITE_URL` | Yes | Your engagement website URL (for the RSVP link) |
 | `WEBSITE_PASSWORD_PRAANYA` | Yes* | Password shown at the bottom of the Praanya invite template |
 | `WEBSITE_PASSWORD_BISWAS` | Yes* | Password shown at the bottom of the Biswas invite template |
@@ -137,6 +149,8 @@ Open [http://localhost:3000](http://localhost:3000).
 | `WEBSITE_PASSWORD` | No | Optional fallback used when a group-specific password is not set |
 
 \* Each template will use its group-specific password if set; otherwise it falls back to `WEBSITE_PASSWORD`. Set either all three group-specific vars (for distinct passwords per family) or just `WEBSITE_PASSWORD` (same password everywhere).
+
+† Each template sends from its group-specific Gmail account if set; otherwise it falls back to `GMAIL_USER` / `GMAIL_APP_PASSWORD`. Set either all three group-specific pairs (for distinct sender addresses per family) or just `GMAIL_USER` + `GMAIL_APP_PASSWORD` (same sender everywhere).
 
 ---
 
