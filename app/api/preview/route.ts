@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
-import { generateEmailHTML, getFaqUrl } from '@/lib/email-template'
+import { ensureAbsoluteUrl, generateEmailHTML, getFaqUrl } from '@/lib/email-template'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,8 +26,12 @@ export async function GET(req: NextRequest) {
     const inviteGroup = members.find((m) => m.invite_group)?.invite_group ?? null
 
     const websiteUrl = process.env.WEBSITE_URL || 'https://your-site.vercel.app'
-    const bgImageUrl = `${websiteUrl}/assets/bg-main.jpeg`
-    const faqUrl = getFaqUrl() || websiteUrl
+    // Background image is hosted by this scheduler app (public/bg-main.jpeg),
+    // so point at this app's own origin rather than the guest-facing
+    // WEBSITE_URL (which lives on a different domain and does not serve the
+    // file).
+    const bgImageUrl = `${req.nextUrl.origin}/bg-main.jpeg`
+    const faqUrl = getFaqUrl() || ensureAbsoluteUrl(websiteUrl)
 
     const html = generateEmailHTML(members, websiteUrl, bgImageUrl, inviteGroup, faqUrl)
 
