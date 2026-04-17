@@ -46,6 +46,35 @@ export function getWebsitePasswordForGroup(group: InviteGroup | null): string {
       return process.env.WEBSITE_PASSWORD_PRAANYA || fallback
   }
 }
+
+// Picks the Gmail sender account (address + app password) for an invite
+// group from environment variables. Falls back to GMAIL_USER/GMAIL_APP_PASSWORD
+// if the group-specific pair is not set, so existing deployments keep working.
+export function getGmailCredentialsForGroup(group: InviteGroup | null): {
+  user: string | undefined
+  pass: string | undefined
+} {
+  const fallbackUser = process.env.GMAIL_USER
+  const fallbackPass = process.env.GMAIL_APP_PASSWORD
+  switch (group) {
+    case 'biswas':
+      return {
+        user: process.env.GMAIL_USER_BISWAS || fallbackUser,
+        pass: process.env.GMAIL_APP_PASSWORD_BISWAS || fallbackPass,
+      }
+    case 'jain':
+      return {
+        user: process.env.GMAIL_USER_JAIN || fallbackUser,
+        pass: process.env.GMAIL_APP_PASSWORD_JAIN || fallbackPass,
+      }
+    case 'praanya':
+    default:
+      return {
+        user: process.env.GMAIL_USER_PRAANYA || fallbackUser,
+        pass: process.env.GMAIL_APP_PASSWORD_PRAANYA || fallbackPass,
+      }
+  }
+}
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ─── TEMPLATE: PRAANYA ───────────────────────────────────────────────────────

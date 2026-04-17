@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 import { createAdminClient } from '@/lib/supabase'
-import { generateEmailHTML, generateSubject } from '@/lib/email-template'
+import {
+  generateEmailHTML,
+  generateSubject,
+  getGmailCredentialsForGroup,
+  normalizeInviteGroup,
+} from '@/lib/email-template'
 
 export async function POST(req: NextRequest) {
   try {
@@ -43,20 +48,33 @@ export async function POST(req: NextRequest) {
     const html = generateEmailHTML(members, websiteUrl, bgImageUrl, inviteGroup)
     const subject = generateSubject(members)
 
+    // Pick the Gmail sender account for this invite group (Praanya / Biswas /
+    // Jain each have their own GMAIL_USER_* / GMAIL_APP_PASSWORD_* env vars).
+    const { user: gmailUser, pass: gmailPass } = getGmailCredentialsForGroup(
+      normalizeInviteGroup(inviteGroup)
+    )
+
+    if (!gmailUser || !gmailPass) {
+      return NextResponse.json(
+        { error: 'Gmail credentials are not configured for this invite group' },
+        { status: 500 }
+      )
+    }
+
     // Create Gmail transporter
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD,
+        user: gmailUser,
+        pass: gmailPass,
       },
     })
 
     // Send with all recipients BCC'd
     await transporter.sendMail({
-      from: `"Aanya & Prad" <${process.env.GMAIL_USER}>`,
-      to: process.env.GMAIL_USER,  // send to yourself
-      bcc: emails,                  // all group members BCC'd
+      from: `"Aanya & Prad" <${gmailUser}>`,
+      to: gmailUser,   // send to the sender account
+      bcc: emails,     // all group members BCC'd
       subject,
       html,
     })
