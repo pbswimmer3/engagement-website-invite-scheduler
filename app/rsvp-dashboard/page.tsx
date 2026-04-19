@@ -67,22 +67,27 @@ const STATUS_STYLES: Record<string, { label: string; cls: string }> = {
   yes: { label: 'Attending', cls: 'bg-green-50 text-green-700 border-green-200' },
   declined: { label: 'Declined', cls: 'bg-red-50 text-red-700 border-red-200' },
   no: { label: 'Declined', cls: 'bg-red-50 text-red-700 border-red-200' },
+  not_attending: { label: 'Declined', cls: 'bg-red-50 text-red-700 border-red-200' },
   maybe: { label: 'Maybe', cls: 'bg-yellow-50 text-yellow-700 border-yellow-200' },
   pending: { label: 'Pending', cls: 'bg-cream text-navy/50 border-gold/20' },
 }
 
+function normalizeStatus(status: string | null | undefined): string {
+  return (status ?? 'pending').toLowerCase().replace(/[\s-]+/g, '_')
+}
+
 function statusInfo(status: string | null | undefined) {
-  const key = (status ?? 'pending').toLowerCase()
+  const key = normalizeStatus(status)
   return STATUS_STYLES[key] ?? { label: status ?? 'Pending', cls: 'bg-cream text-navy/60 border-gold/20' }
 }
 
 function isAttending(s: string) {
-  const k = s.toLowerCase()
+  const k = normalizeStatus(s)
   return k === 'attending' || k === 'yes'
 }
 function isDeclined(s: string) {
-  const k = s.toLowerCase()
-  return k === 'declined' || k === 'no'
+  const k = normalizeStatus(s)
+  return k === 'declined' || k === 'no' || k === 'not_attending'
 }
 
 export default function RsvpDashboard() {
