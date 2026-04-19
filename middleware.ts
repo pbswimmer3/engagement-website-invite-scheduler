@@ -21,6 +21,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // Public image assets served from /public (e.g. /bg-main.jpeg) must be
+  // reachable without auth so Gmail's image proxy can fetch them when a
+  // recipient opens the invite email.
+  if (/\.(jpe?g|png|gif|webp|svg|ico|avif)$/i.test(pathname)) {
+    return NextResponse.next()
+  }
+
   const sitePassword = process.env.SITE_PASSWORD
   if (!sitePassword) {
     // SITE_PASSWORD env var is missing. Log loudly and still redirect
