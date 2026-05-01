@@ -539,5 +539,5 @@ export function generateEmailHTML(
 }
 
 export function generateSubject(_members?: Member[]) {
-  return `You're Invited to Aanya & Prad's Engagement Celebration!`
+  return `RSVP Reminder - You're Invited to Aanya & Prad's Engagement Celebration!`
 }
